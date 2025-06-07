@@ -40,13 +40,35 @@ paletteColors.forEach(color => {
 
 // 🧱 Draw the grid
 function drawGrid(grid) {
+  // Draw pixels
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
       ctx.fillStyle = grid[y][x] || "#ffffff";
       ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
     }
   }
+
+  // Draw grid lines
+  ctx.strokeStyle = "rgba(0,0,0,0.1)"; // very light black
+  ctx.lineWidth = 1;
+
+  // Vertical lines
+  for (let x = 0; x <= gridSize; x++) {
+    ctx.beginPath();
+    ctx.moveTo(x * pixelSize + 0.5, 0);            // +0.5 for crisp lines
+    ctx.lineTo(x * pixelSize + 0.5, canvas.height);
+    ctx.stroke();
+  }
+
+  // Horizontal lines
+  for (let y = 0; y <= gridSize; y++) {
+    ctx.beginPath();
+    ctx.moveTo(0, y * pixelSize + 0.5);
+    ctx.lineTo(canvas.width, y * pixelSize + 0.5);
+    ctx.stroke();
+  }
 }
+
 
 // ✅ JSONP utility with dynamic callback names
 function jsonpFetch(url) {
