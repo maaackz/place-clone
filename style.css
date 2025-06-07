@@ -1,0 +1,24 @@
+body {
+  font-family: sans-serif;
+  text-align: center;
+  background: #f8f8f8;
+}
+canvas {
+  border: 2px solid black;
+  image-rendering: pixelated;
+  cursor: crosshair;
+}
+.palette {
+  margin: 10px;
+}
+.color {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  cursor: pointer;
+  border: 1px solid #000;
+}
+button {
+  margin-top: 10px;
+  padding: 5px 10px;
+}
