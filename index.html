@@ -16,11 +16,11 @@
 <canvas id="canvas" width="500" height="500"></canvas>
 
 <div class="palette" id="palette"></div>
-<button onclick="resetCanvas()">🧹 Reset Canvas</button>
+<!-- <button onclick="resetCanvas()">🧹 Reset Canvas</button> -->
 <p id="status">Click a pixel to color it</p>
 
 <script>
-const api = "https://script.google.com/macros/s/AKfycbz9te2Hdo7Sz3NeKZdQ3exCmX-NplQ9PUS9oJ_Bb9JRb9W1IcXa2w7sYGxdWYDqpgvw/exec";
+const api = "https://script.google.com/macros/s/AKfycbw4BoAACY8qxC0TrN6JD31AYkgeAzUlAu7KXpJC6tICTGF6I64Ec_ea0a6iskx7t-cc/exec";
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const gridSize = 50;
@@ -97,20 +97,20 @@ async function updatePixel(x, y, color) {
 }
 
 // 🧹 Reset canvas using GET + JSONP
-async function resetCanvas() {
-  document.getElementById("status").textContent = "Resetting canvas...";
-  try {
-    const json = await jsonpFetch(api + "?action=reset");
-    if (json.success) {
-      await loadGrid();
-      document.getElementById("status").textContent = "Canvas reset!";
-    } else {
-      document.getElementById("status").textContent = "Failed to reset canvas: " + json.message;
-    }
-  } catch (err) {
-    document.getElementById("status").textContent = "Error resetting canvas";
-  }
-}
+// async function resetCanvas() {
+//   document.getElementById("status").textContent = "Resetting canvas...";
+//   try {
+//     const json = await jsonpFetch(api + "?action=reset");
+//     if (json.success) {
+//       await loadGrid();
+//       document.getElementById("status").textContent = "Canvas reset!";
+//     } else {
+//       document.getElementById("status").textContent = "Failed to reset canvas: " + json.message;
+//     }
+//   } catch (err) {
+//     document.getElementById("status").textContent = "Error resetting canvas";
+//   }
+// }
 
 // 🎯 Handle canvas clicks
 canvas.addEventListener("click", async (e) => {
