@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mini r/place</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; background: #f8f8f8; }
+    canvas { border: 2px solid black; image-rendering: pixelated; cursor: crosshair; }
+    .palette { margin: 10px; }
+    .color { width: 20px; height: 20px; display: inline-block; cursor: pointer; border: 1px solid #000; }
+    button { margin-top: 10px; padding: 5px 10px; }
+  </style>
+</head>
+<body>
+
+<h1>🎨 Mini r/place</h1>
+<canvas id="canvas" width="500" height="500"></canvas>
+
+<div class="palette" id="palette"></div>
+<button onclick="resetCanvas()">🧹 Reset Canvas</button>
+<p id="status">Click a pixel to color it</p>
+
+<script>
+const api = "https://script.google.com/macros/s/AKfycbyXffhsmzuUfzEGqfO6p0tkRnr_aZfbbuyyU7oykAabBWE0l1VvYl5hXYv7JRctrz7O/exec"; // Replace with your actual Apps Script URL
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const gridSize = 50;
+const pixelSize = canvas.width / gridSize;
+const paletteColors = ["#000000", "#ffffff", "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff"];
+let selectedColor = paletteColors[0];
+
+// Build color palette
+const palette = document.getElementById("palette");
+paletteColors.forEach(color => {
+  const swatch = document.createElement("div");
+  swatch.className = "color";
+  swatch.style.backgroundColor = color;
+  swatch.onclick = () => selectedColor = color;
+  palette.appendChild(swatch);
+});
+
+function drawGrid(grid) {
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      ctx.fillStyle = grid[y][x] || "#ffffff";
+      ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+    }
+  }
+}
+
+async function loadGrid() {
+  try {
+    const res = await fetch(api + "?action=get");
+    const json = await res.json();
+    if (json.success) {
+      drawGrid(json.data);
+    } else {
+      document.getElementById("status").textContent = "Failed to load canvas: " + json.message;
+    }
+  } catch (err) {
+    document.getElementById("status").textContent = "Error loading canvas";
+  }
+}
+
+async function updatePixel(x, y, color) {
+  try {
+    const res = await fetch(api, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ x, y, color })
+    });
+    const json = await res.json();
+    return json.success;
+  } catch (err) {
+    console.error("Update failed", err);
+    return false;
+  }
+}
+
+canvas.addEventListener("click", async (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) / pixelSize);
+  const y = Math.floor((e.clientY - rect.top) / pixelSize);
+
+  document.getElementById("status").textContent = `Placing at (${x}, ${y})...`;
+
+  const success = await updatePixel(x, y, selectedColor);
+  if (success) {
+    await loadGrid();
+    document.getElementById("status").textContent = `Placed color ${selectedColor} at (${x}, ${y})`;
+  } else {
+    document.getElementById("status").textContent = `Failed to place color at (${x}, ${y})`;
+  }
+});
+
+async function resetCanvas() {
+  document.getElementById("status").textContent = "Resetting canvas...";
+  const res = await fetch(api + "?action=reset");
+  const json = await res.json();
+  if (json.success) {
+    await loadGrid();
+    document.getElementById("status").textContent = "Canvas reset!";
+  } else {
+    document.getElementById("status").textContent = "Failed to reset canvas: " + json.message;
+  }
+}
+
+// Auto refresh grid every 5 seconds
+setInterval(loadGrid, 5000);
+loadGrid();
+</script>
+
+</body>
+</html>
